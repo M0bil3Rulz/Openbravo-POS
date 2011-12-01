@@ -59,6 +59,10 @@ public abstract class JEditorNumber extends JEditorAbstract {
     }   
     
     public void setDoubleValue(Double dvalue) {
+        // AK - Round values up or down to nearest whole value
+        double roundedValue = Math.round( dvalue );
+        dvalue = new Double( roundedValue );
+        // 
         
         String sOldText = getText();
         
@@ -95,6 +99,9 @@ public abstract class JEditorNumber extends JEditorAbstract {
     }
     
     public void setValueInteger(int ivalue) {
+        // AK - Round values up or down to nearest whole value
+        ivalue = Math.round( ivalue );
+        // 
         
         String sOldText = getText();
         

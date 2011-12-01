@@ -30,10 +30,12 @@ public class JEditorStringNumber extends JEditorText {
         super();
     }
     
+    @Override
     protected int getMode() {
         return EditorKeys.MODE_INTEGER_POSITIVE;
     } 
         
+    @Override
     protected int getStartMode() {
         return MODE_123;
     }    

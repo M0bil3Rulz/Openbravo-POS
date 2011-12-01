@@ -237,6 +237,25 @@ public class DataLogicSales extends BeanFactoryDataSingle {
                         dr.getInt(9));
             }});
     }
+    
+    public final SentenceList getTaxInfoByID(String id) {
+        return new StaticSentence(s
+            , "SELECT ID, NAME, CATEGORY, VALIDFROM, CUSTCATEGORY, PARENTID, RATE, RATECASCADE, RATEORDER FROM TAXES WHERE NAME = '" + id + "'"
+            , null
+            , new SerializerRead() { public Object readValues(DataRead dr) throws BasicException {
+                return new TaxInfo(
+                        dr.getString(1), 
+                        dr.getString(2),
+                        dr.getString(3),
+                        dr.getTimestamp(4),
+                        dr.getString(5),
+                        dr.getString(6),
+                        dr.getDouble(7).doubleValue(),
+                        dr.getBoolean(8).booleanValue(),
+                        dr.getInt(9));
+            }});
+    }
+    
     public final SentenceList getCategoriesList() {
         return new StaticSentence(s
             , "SELECT ID, NAME, IMAGE FROM CATEGORIES ORDER BY NAME"
@@ -445,6 +464,7 @@ public class DataLogicSales extends BeanFactoryDataSingle {
                 SentenceExec taxlinesinsert = new PreparedSentence(s
                         , "INSERT INTO TAXLINES (ID, RECEIPT, TAXID, BASE, AMOUNT)  VALUES (?, ?, ?, ?, ?)"
                         , SerializerWriteParams.INSTANCE);
+                
                 if (ticket.getTaxes() != null) {
                     for (final TicketTaxInfo tickettax: ticket.getTaxes()) {
                         taxlinesinsert.exec(new DataParams() { public void writeValues() throws BasicException {

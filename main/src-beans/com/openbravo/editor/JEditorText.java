@@ -122,10 +122,12 @@ public abstract class JEditorText extends JEditorAbstract {
         }        
     }
       
+    @Override
     protected final int getAlignment() {
         return javax.swing.SwingConstants.LEFT;
     }
        
+    @Override
     protected final String getEditMode() {
         switch (m_iMode) {
         case MODE_Abc1: return "Abc1";
@@ -136,6 +138,7 @@ public abstract class JEditorText extends JEditorAbstract {
         }
     }
     
+    @Override
     protected String getTextEdit() {
         
         StringBuffer s = new StringBuffer();
@@ -153,12 +156,14 @@ public abstract class JEditorText extends JEditorAbstract {
         return s.toString(); 
     }
     
+    @Override
     protected String getTextFormat() throws BasicException {
         return (m_svalue == null)
                 ? "<html>"
                 : "<html>" + m_svalue;
     }
     
+    @Override
     protected void typeCharInternal(char c) {
         
         String sOldText = getText();

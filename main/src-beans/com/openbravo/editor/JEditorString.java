@@ -26,10 +26,12 @@ public class JEditorString extends JEditorText {
         super();
     }
     
+    @Override
     protected final int getMode() {
         return EditorKeys.MODE_STRING;
     }
         
+    @Override
     protected int getStartMode() {
         return MODE_Abc1;
     }

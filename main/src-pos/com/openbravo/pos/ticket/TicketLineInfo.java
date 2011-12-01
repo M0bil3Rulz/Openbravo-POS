@@ -172,7 +172,7 @@ public class TicketLineInfo implements SerializableWrite, SerializableRead, Seri
         l.attributes = (Properties) attributes.clone();
         return l;
     }
-
+    
     public int getTicketLine() {
         return m_iLine;
     }
@@ -278,11 +278,13 @@ public class TicketLineInfo implements SerializableWrite, SerializableRead, Seri
     }
 
     public double getTax() {
-        return price * multiply * getTaxRate();
+        // AK - add math round
+        return Math.round( price * multiply * getTaxRate() );
     }
 
     public double getValue() {
-        return price * multiply * (1.0 + getTaxRate());
+        // AK - added math rounding
+        return Math.round( price * multiply * (1.0 + getTaxRate()) );
     }
 
     public String printName() {

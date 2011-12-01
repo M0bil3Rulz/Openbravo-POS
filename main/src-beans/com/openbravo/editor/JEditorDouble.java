@@ -27,10 +27,12 @@ public class JEditorDouble extends JEditorNumber {
     public JEditorDouble() {
     }
     
+    @Override
     protected Formats getFormat() {
         return Formats.DOUBLE;
     }    
     
+    @Override
     protected int getMode() {
         return EditorKeys.MODE_DOUBLE;
     }      

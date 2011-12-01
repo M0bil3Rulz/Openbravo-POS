@@ -31,6 +31,11 @@ import com.openbravo.pos.forms.AppLocal;
 import com.openbravo.pos.forms.AppView;
 import com.openbravo.pos.ticket.TicketLineInfo;
 
+import com.openbravo.pos.forms.DataLogicSales; // AK
+import com.openbravo.data.loader.SentenceList; // AK
+import com.openbravo.data.gui.ComboBoxValModel; // AK
+import com.openbravo.pos.ticket.TaxInfo; // AK
+
 /**
  *
  * @author adrianromero
@@ -41,7 +46,8 @@ public class JProductLineEdit extends javax.swing.JDialog {
     private TicketLineInfo m_oLine;
     private boolean m_bunitsok;
     private boolean m_bpriceok;
-            
+    private DataLogicSales m_dlSales; // AK
+        
     /** Creates new form JProductLineEdit */
     private JProductLineEdit(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -55,6 +61,15 @@ public class JProductLineEdit extends javax.swing.JDialog {
         // Inicializo los componentes
         initComponents();
 
+        // AK
+        m_dlSales = (DataLogicSales) app.getBean("com.openbravo.pos.forms.DataLogicSales");
+        // The taxes model
+        SentenceList taxcatsent = m_dlSales.getTaxList();
+        
+        ComboBoxValModel taxcatmodel = new ComboBoxValModel(taxcatsent.list());
+        m_jTax.setModel(taxcatmodel);
+        //
+        
         if (oLine.getTaxInfo() == null) {
             throw new BasicException(AppLocal.getIntString("message.cannotcalculatetaxes"));
         }
@@ -66,7 +81,9 @@ public class JProductLineEdit extends javax.swing.JDialog {
         m_jName.setEnabled(m_oLine.getProductID() == null && app.getAppUserView().getUser().hasPermission("com.openbravo.pos.sales.JPanelTicketEdits"));
         m_jPrice.setEnabled(app.getAppUserView().getUser().hasPermission("com.openbravo.pos.sales.JPanelTicketEdits"));
         m_jPriceTax.setEnabled(app.getAppUserView().getUser().hasPermission("com.openbravo.pos.sales.JPanelTicketEdits"));
-        
+        // AK
+        m_jTax.setEnabled(app.getAppUserView().getUser().hasPermission("com.openbravo.pos.sales.JPanelTicketEdits"));
+                
         m_jName.setText(m_oLine.getProperty("product.name"));
         m_jUnits.setDoubleValue(oLine.getMultiply());
         m_jPrice.setDoubleValue(oLine.getPrice()); 
@@ -77,7 +94,7 @@ public class JProductLineEdit extends javax.swing.JDialog {
         m_jUnits.addPropertyChangeListener("Edition", new RecalculateUnits());
         m_jPrice.addPropertyChangeListener("Edition", new RecalculatePrice());
         m_jPriceTax.addPropertyChangeListener("Edition", new RecalculatePriceTax());
-
+        
         m_jName.addEditorKeys(m_jKeys);
         m_jUnits.addEditorKeys(m_jKeys);
         m_jPrice.addEditorKeys(m_jKeys);
@@ -212,6 +229,8 @@ public class JProductLineEdit extends javax.swing.JDialog {
         m_jTotal = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         m_jSubtotal = new javax.swing.JLabel();
+        m_jTax = new javax.swing.JComboBox();
+        jLabelTax = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         m_jButtonOK = new javax.swing.JButton();
         m_jButtonCancel = new javax.swing.JButton();
@@ -228,19 +247,19 @@ public class JProductLineEdit extends javax.swing.JDialog {
 
         jLabel1.setText(AppLocal.getIntString("label.price")); // NOI18N
         jPanel2.add(jLabel1);
-        jLabel1.setBounds(10, 80, 90, 15);
+        jLabel1.setBounds(10, 80, 90, 16);
 
         jLabel2.setText(AppLocal.getIntString("label.units")); // NOI18N
         jPanel2.add(jLabel2);
-        jLabel2.setBounds(10, 50, 90, 15);
+        jLabel2.setBounds(10, 50, 90, 16);
 
         jLabel3.setText(AppLocal.getIntString("label.pricetax")); // NOI18N
         jPanel2.add(jLabel3);
-        jLabel3.setBounds(10, 110, 90, 15);
+        jLabel3.setBounds(10, 110, 90, 16);
 
         jLabel4.setText(AppLocal.getIntString("label.item")); // NOI18N
         jPanel2.add(jLabel4);
-        jLabel4.setBounds(10, 20, 90, 15);
+        jLabel4.setBounds(10, 20, 90, 16);
         jPanel2.add(m_jName);
         m_jName.setBounds(100, 20, 270, 25);
         jPanel2.add(m_jUnits);
@@ -261,11 +280,11 @@ public class JProductLineEdit extends javax.swing.JDialog {
 
         jLabel5.setText(AppLocal.getIntString("label.tax")); // NOI18N
         jPanel2.add(jLabel5);
-        jLabel5.setBounds(10, 140, 90, 15);
+        jLabel5.setBounds(10, 140, 90, 16);
 
         jLabel6.setText(AppLocal.getIntString("label.totalcash")); // NOI18N
         jPanel2.add(jLabel6);
-        jLabel6.setBounds(10, 200, 90, 15);
+        jLabel6.setBounds(10, 200, 90, 16);
 
         m_jTotal.setBackground(javax.swing.UIManager.getDefaults().getColor("TextField.disabledBackground"));
         m_jTotal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -278,7 +297,7 @@ public class JProductLineEdit extends javax.swing.JDialog {
 
         jLabel7.setText(AppLocal.getIntString("label.subtotalcash")); // NOI18N
         jPanel2.add(jLabel7);
-        jLabel7.setBounds(10, 170, 90, 15);
+        jLabel7.setBounds(10, 170, 90, 16);
 
         m_jSubtotal.setBackground(javax.swing.UIManager.getDefaults().getColor("TextField.disabledBackground"));
         m_jSubtotal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -288,6 +307,19 @@ public class JProductLineEdit extends javax.swing.JDialog {
         m_jSubtotal.setRequestFocusEnabled(false);
         jPanel2.add(m_jSubtotal);
         m_jSubtotal.setBounds(100, 170, 210, 25);
+
+        m_jTax.setDoubleBuffered(true);
+        m_jTax.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                m_jTaxItemStateChanged(evt);
+            }
+        });
+        jPanel2.add(m_jTax);
+        m_jTax.setBounds(100, 250, 170, 20);
+
+        jLabelTax.setText("Update Tax");
+        jPanel2.add(jLabelTax);
+        jLabelTax.setBounds(10, 250, 80, 16);
 
         jPanel5.add(jPanel2, java.awt.BorderLayout.CENTER);
 
@@ -349,6 +381,28 @@ public class JProductLineEdit extends javax.swing.JDialog {
         dispose();
 
     }//GEN-LAST:event_m_jButtonOKActionPerformed
+
+    // AK
+    private void m_jTaxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_m_jTaxItemStateChanged
+ 
+        // Note: you have to change values in two places for certain things...
+        //       you don't have to do this with units or price, but tax
+        //       stuff you do.
+        TaxInfo newTaxType = (TaxInfo)m_jTax.getSelectedItem();
+        if(null != newTaxType) {           
+            m_oLine.setTaxInfo(newTaxType);
+            m_jTaxrate.setText(newTaxType.getName());
+            m_jPriceTax.setDoubleValue(m_oLine.getPriceTax());
+            // This is needed in order to presist the change if the user leaves the ticket
+            // window and goes to another screen. For example, if you are on the ticket
+            // window and then you go to the "Edit Sales" panel, this saves the tax id
+            // to the ticket lines being persisted.
+            m_oLine.setProperty("product.taxcategoryid", newTaxType.getTaxCategoryID());
+        
+        }
+
+        printTotals();
+    }//GEN-LAST:event_m_jTaxItemStateChanged
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
@@ -358,6 +412,7 @@ public class JProductLineEdit extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabelTax;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -370,6 +425,7 @@ public class JProductLineEdit extends javax.swing.JDialog {
     private com.openbravo.editor.JEditorCurrency m_jPrice;
     private com.openbravo.editor.JEditorCurrency m_jPriceTax;
     private javax.swing.JLabel m_jSubtotal;
+    private javax.swing.JComboBox m_jTax;
     private javax.swing.JLabel m_jTaxrate;
     private javax.swing.JLabel m_jTotal;
     private com.openbravo.editor.JEditorDouble m_jUnits;
